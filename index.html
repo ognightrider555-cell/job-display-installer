@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job Display Installer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tilt+Neon&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05070a;
+    --panel: #0d1117;
+    --edge: #1f2933;
+    --text: #e8edf2;
+    --muted: #8a96a3;
+    --red: #ff2830;
+    --blue: #2878ff;
+    --green: #28ff6e;
+    --amber: #f5a524;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 500 17px/1.45 Rajdhani, system-ui, sans-serif;
+  }
+  main { max-width: 640px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 {
+    font: 400 clamp(34px, 9vw, 52px)/1 "Tilt Neon", sans-serif;
+    text-align: center;
+    margin: 8px 0 4px;
+    letter-spacing: 1px;
+  }
+  .dssi { color: #ffd6d8; text-shadow: 0 0 4px var(--red), 0 0 12px var(--red), 0 0 28px var(--red); }
+  .safety { color: #d6e4ff; text-shadow: 0 0 4px var(--blue), 0 0 12px var(--blue), 0 0 28px var(--blue); }
+  .tube { height: 3px; margin: 10px auto 6px; width: min(360px, 80%); border-radius: 2px;
+          background: #c8ffd9; box-shadow: 0 0 6px var(--green), 0 0 16px var(--green); }
+  .sub { text-align: center; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 28px; }
+  section {
+    background: var(--panel);
+    border: 1px solid var(--edge);
+    border-radius: 12px;
+    padding: 18px 18px 20px;
+    margin-bottom: 16px;
+  }
+  section.dim { opacity: .45; pointer-events: none; }
+  h2 { margin: 0 0 10px; font-size: 19px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  h2 .n { display: inline-block; width: 26px; height: 26px; line-height: 26px; text-align: center;
+          border-radius: 50%; border: 2px solid var(--blue); color: var(--text); margin-right: 8px;
+          box-shadow: 0 0 8px var(--blue); font-size: 15px; }
+  p { margin: 6px 0; }
+  .muted { color: var(--muted); }
+  .boards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 480px) { .boards { grid-template-columns: 1fr; } }
+  .board { border: 2px solid var(--edge); border-radius: 10px; padding: 10px 12px; cursor: pointer; display: block; }
+  .board input { display: none; }
+  .board b { display: block; font-size: 18px; }
+  .board span { color: var(--muted); font-size: 15px; }
+  .board:has(input:checked) { border-color: var(--green); box-shadow: 0 0 10px rgba(40, 255, 110, .35); }
+  .board.off { opacity: .45; cursor: not-allowed; }
+  button {
+    font: 700 17px Rajdhani, sans-serif; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text); background: transparent; border: 2px solid var(--green); border-radius: 8px;
+    padding: 10px 18px; cursor: pointer; box-shadow: 0 0 10px rgba(40, 255, 110, .35);
+  }
+  button:hover:not(:disabled) { background: rgba(40, 255, 110, .12); }
+  button:disabled { opacity: .4; cursor: default; box-shadow: none; }
+  button.link { border: none; box-shadow: none; padding: 0; color: var(--blue); text-transform: none;
+                letter-spacing: 0; font-weight: 600; }
+  label.f { display: block; margin: 10px 0 4px; color: var(--muted); font-size: 15px; text-transform: uppercase; letter-spacing: 1px; }
+  input[type=text], input[type=password], select {
+    width: 100%; font: 600 17px Rajdhani, sans-serif; color: var(--text); background: #05070a;
+    border: 1px solid #2a3440; border-radius: 6px; padding: 9px 10px;
+  }
+  input:focus, select:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 6px var(--blue); }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+  progress { width: 100%; height: 8px; margin-top: 12px; appearance: none; border: none; border-radius: 4px; background: #1f2933; }
+  progress::-webkit-progress-bar { background: #1f2933; border-radius: 4px; }
+  progress::-webkit-progress-value { background: var(--green); border-radius: 4px; box-shadow: 0 0 6px var(--green); }
+  .status { margin-top: 10px; font-weight: 600; min-height: 1.4em; }
+  .ok { color: var(--green); }
+  .warn { color: var(--amber); }
+  .err { color: var(--red); }
+  details { margin-top: 12px; }
+  summary { cursor: pointer; color: var(--muted); }
+  pre { background: #05070a; border: 1px solid var(--edge); border-radius: 6px; padding: 8px; max-height: 220px;
+        overflow: auto; font-size: 12px; color: var(--muted); white-space: pre-wrap; word-break: break-all; }
+  .note { border-left: 3px solid var(--amber); padding-left: 10px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1><span class="dssi">DSSI</span> <span class="safety">SAFETY</span></h1>
+  <div class="tube"></div>
+  <div class="sub">Job Display Installer</div>
+
+  <section id="nobrowser" hidden>
+    <h2>Use Chrome or Edge on a computer</h2>
+    <p>This installer talks to the display over USB, which only Chrome and Edge on Windows, Mac or Linux can do. It won't work on a phone, Safari or Firefox.</p>
+  </section>
+
+  <section id="s1">
+    <h2><span class="n">1</span>Pick the board</h2>
+    <div class="boards" id="boards"></div>
+  </section>
+
+  <section id="s2">
+    <h2><span class="n">2</span>Install</h2>
+    <p>Plug the display into this computer with a USB cable, then click Install and choose its port.</p>
+    <p class="muted" id="version"></p>
+    <div class="row">
+      <button id="install">Install</button>
+      <button class="link" id="skip">Already installed? Skip to setup</button>
+    </div>
+    <progress id="progress" max="1" value="0" hidden></progress>
+    <div class="status" id="flashStatus"></div>
+  </section>
+
+  <section id="s3" class="dim">
+    <h2><span class="n">3</span>Set up</h2>
+    <p class="muted">Keep the display plugged in. Leave a field blank to keep what the display already has.</p>
+    <label class="f" for="key">Setup key</label>
+    <input type="password" id="key" autocomplete="off" spellcheck="false" placeholder="From the person who sent you this link">
+    <label class="f" for="ssid">Wi-Fi name</label>
+    <input type="text" id="ssid" autocomplete="off" spellcheck="false">
+    <label class="f" for="pass">Wi-Fi password</label>
+    <input type="password" id="pass" autocomplete="off">
+    <label class="f" for="tz">Time zone</label>
+    <select id="tz"></select>
+    <div class="row">
+      <button id="send">Send to display</button>
+      <label class="muted"><input type="checkbox" id="show"> Show key and password</label>
+    </div>
+    <div class="status" id="setupStatus"></div>
+  </section>
+
+  <details>
+    <summary>Log</summary>
+    <pre id="log"></pre>
+  </details>
+</main>
+
+<script type="module">
+import { ESPLoader, Transport } from "https://cdn.jsdelivr.net/npm/esptool-js@0.7.0/bundle.js";
+
+const BOARDS = [
+  { id: "nm", name: "NM-CYD-C5", desc: "2.8\" yellow board, resistive touch", file: "nm-cyd-c5.bin", vid: 0x1a86 },
+  { id: "ws28", name: "Waveshare C5 2.8\"", desc: "Black glass, capacitive touch, battery", file: "waveshare-c5-28.bin", vid: 0x303a },
+];
+const ZONES = [
+  ["Eastern", "EST5EDT,M3.2.0,M11.1.0", ["America/New_York", "America/Detroit", "America/Indiana/Indianapolis", "America/Kentucky/Louisville"]],
+  ["Central", "CST6CDT,M3.2.0,M11.1.0", ["America/Chicago", "America/Indiana/Knox", "America/Menominee"]],
+  ["Mountain", "MST7MDT,M3.2.0,M11.1.0", ["America/Denver", "America/Boise"]],
+  ["Arizona (no daylight saving)", "MST7", ["America/Phoenix"]],
+  ["Pacific", "PST8PDT,M3.2.0,M11.1.0", ["America/Los_Angeles"]],
+  ["Alaska", "AKST9AKDT,M3.2.0,M11.1.0", ["America/Anchorage"]],
+  ["Hawaii", "HST10", ["Pacific/Honolulu"]],
+];
+
+const $ = (id) => document.getElementById(id);
+const logBox = $("log");
+const log = (s) => { logBox.textContent += s + "\n"; logBox.scrollTop = logBox.scrollHeight; };
+const status = (el, text, cls = "") => { el.textContent = text; el.className = "status " + cls; };
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+let versions = {};
+let lastPortInfo = null;
+
+if (!("serial" in navigator)) {
+  $("nobrowser").hidden = false;
+  for (const id of ["s1", "s2", "s3"]) $(id).classList.add("dim");
+}
+
+// Boards and versions
+try {
+  versions = await (await fetch("firmware/versions.json", { cache: "no-store" })).json();
+} catch { versions = {}; }
+for (const b of BOARDS) {
+  const v = versions[b.id];
+  const label = document.createElement("label");
+  label.className = "board" + (v ? "" : " off");
+  label.innerHTML = `<input type="radio" name="board" value="${b.id}" ${v ? "" : "disabled"}>
+    <b>${b.name}</b><span>${v ? b.desc : "Coming soon"}</span>`;
+  $("boards").append(label);
+}
+const firstAvailable = document.querySelector('input[name=board]:not(:disabled)');
+if (firstAvailable) firstAvailable.checked = true;
+const board = () => BOARDS.find((b) => b.id === document.querySelector('input[name=board]:checked')?.value);
+const showVersion = () => {
+  const v = board() && versions[board().id];
+  $("version").textContent = v ? `Firmware ${v.version}` : "";
+};
+$("boards").addEventListener("change", showVersion);
+showVersion();
+
+// Time zones, defaulting to this computer's
+const here = Intl.DateTimeFormat().resolvedOptions().timeZone;
+$("tz").innerHTML = `<option value="">Keep the display's setting</option>` +
+  ZONES.map(([name, posix, iana]) => `<option value="${posix}" ${iana.includes(here) ? "selected" : ""}>${name}</option>`).join("");
+
+$("show").addEventListener("change", (e) => {
+  for (const id of ["key", "pass"]) $(id).type = e.target.checked ? "text" : "password";
+});
+
+// ---- Step 2: flash ----
+
+$("install").addEventListener("click", async () => {
+  const b = board();
+  if (!b) return;
+  const st = $("flashStatus");
+  let transport;
+  try {
+    status(st, "Downloading firmware...");
+    const res = await fetch(`firmware/${b.file}`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Couldn't download the firmware (${res.status})`);
+    const image = new Uint8Array(await res.arrayBuffer());
+
+    status(st, "Choose the display's port in the list...");
+    const port = await navigator.serial.requestPort();
+    lastPortInfo = port.getInfo();
+    const detected = BOARDS.find((x) => x.vid === lastPortInfo.usbVendorId);
+    if (detected && detected.id !== b.id && versions[detected.id]) {
+      throw new Error(`That port looks like a ${detected.name}. Pick that board in step 1, or check the cable.`);
+    }
+
+    status(st, "Connecting...");
+    transport = new Transport(port, false);
+    const loader = new ESPLoader({
+      transport, baudrate: 921600, romBaudrate: 115200,
+      terminal: { clean() {}, writeLine: log, write: (s) => log(s) },
+    });
+    const chip = await loader.main();
+    log(`Chip: ${chip}`);
+    if (!/ESP32-C5/i.test(chip)) throw new Error(`This display has an ${chip}, not an ESP32-C5.`);
+
+    $("progress").hidden = false;
+    status(st, "Installing... keep the cable plugged in");
+    await loader.writeFlash({
+      fileArray: [{ data: image, address: 0 }],
+      flashMode: "keep", flashFreq: "keep", flashSize: "keep",
+      eraseAll: false, compress: true,
+      reportProgress: (i, written, total) => { $("progress").value = written / total; },
+    });
+    await loader.after("hard_reset");
+    await transport.disconnect();
+    transport = null;
+    $("progress").value = 1;
+    status(st, "Installed. The display is restarting.", "ok");
+    $("s3").classList.remove("dim");
+    $("key").focus();
+  } catch (e) {
+    log(String(e?.stack || e));
+    status(st, e?.name === "NotFoundError" ? "No port chosen." : `Install failed: ${e.message || e}`, "err");
+    try { await transport?.disconnect(); } catch {}
+  }
+});
+
+$("skip").addEventListener("click", () => {
+  $("s3").classList.remove("dim");
+  $("key").focus();
+});
+
+// ---- Step 3: setup over the serial console ----
+
+const hex = (s) => [...new TextEncoder().encode(s)].map((b) => b.toString(16).padStart(2, "0")).join("");
+
+// After a reset the board's USB port can come back as a new port; find it again
+async function findPort() {
+  if (lastPortInfo) {
+    for (let i = 0; i < 30; i++) {
+      for (const p of await navigator.serial.getPorts()) {
+        const info = p.getInfo();
+        if (info.usbVendorId === lastPortInfo.usbVendorId && info.usbProductId === lastPortInfo.usbProductId) {
+          try { await p.open({ baudRate: 115200 }); return p; } catch {}
+        }
+      }
+      await sleep(500);
+    }
+  }
+  const p = await navigator.serial.requestPort();
+  lastPortInfo = p.getInfo();
+  await p.open({ baudRate: 115200 });
+  return p;
+}
+
+$("send").addEventListener("click", async () => {
+  const st = $("setupStatus");
+  const key = $("key").value.trim(), ssid = $("ssid").value, pass = $("pass").value, tz = $("tz").value;
+  if (key && !/^[A-Za-z0-9_]{20,127}$/.test(key)) return status(st, "That setup key doesn't look right. Copy it again, with nothing extra.", "err");
+  if (!key && !ssid && !tz) return status(st, "Nothing to send yet.", "warn");
+
+  let port, reader, writer, lines = [], done = false;
+  try {
+    status(st, "Connecting to the display...");
+    port = await findPort();
+    // Release reset/boot lines so the board runs normally
+    try { await port.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch {}
+    writer = port.writable.getWriter();
+    reader = port.readable.getReader();
+    (async () => {
+      const dec = new TextDecoder();
+      let buf = "";
+      while (!done) {
+        const { value, done: end } = await reader.read().catch(() => ({ done: true }));
+        if (end) break;
+        buf += dec.decode(value, { stream: true });
+        let i;
+        while ((i = buf.indexOf("\n")) >= 0) {
+          const line = buf.slice(0, i).replace(/\r$/, "").replace(/\x1b\[[0-9;]*m/g, "");
+          buf = buf.slice(i + 1);
+          if (line) { lines.push(line); log(line); }
+        }
+      }
+    })();
+    const send = (s) => writer.write(new TextEncoder().encode(s + "\n"));
+    const waitFor = async (re, ms, resend) => {
+      const t0 = Date.now();
+      let next = 0;
+      while (Date.now() - t0 < ms) {
+        const hit = lines.find((l) => re.test(l));
+        if (hit) { lines = lines.filter((l) => l !== hit); return hit; }
+        if (resend && Date.now() >= next) { await send(resend); next = Date.now() + 800; }
+        await sleep(100);
+      }
+      return null;
+    };
+
+    status(st, "Waiting for the display to answer...");
+    const hello = await waitFor(/^JOBD OK .*\|/, 25000, "JOBD?");
+    if (!hello) throw new Error("The display didn't answer. Unplug it, plug it back in, and try again.");
+    const [boardName, version] = hello.replace(/^JOBD OK /, "").split("|");
+    log(`Display: ${boardName}, firmware ${version}`);
+
+    const step = async (cmd, tag, what) => {
+      lines = [];
+      await send(cmd);
+      const r = await waitFor(new RegExp(`^JOBD (OK|ERR) ${tag}$`), 5000);
+      if (!r) throw new Error(`The display didn't confirm the ${what}.`);
+      if (r.startsWith("JOBD ERR")) throw new Error(`The display rejected the ${what}.`);
+    };
+    if (tz) await step(`JOBD TZ ${tz}`, "TZ", "time zone");
+    if (key) await step(`JOBD KEY ${key}`, "KEY", "setup key");
+    if (ssid) await step(`JOBD WIFI ${hex(ssid)} ${hex(pass)}`, "WIFI", "Wi-Fi details");
+
+    status(st, "Saved. Checking Wi-Fi and the job list...");
+    // Only outcomes that can follow what was just sent: with new Wi-Fi details,
+    // a "no Wi-Fi" line from before they arrived doesn't count
+    const outcomes = ["Loaded \\d+ jobs?", "Up to date", "Wrong password", "Couldn't join", "GitHub \\d+", "Can't reach GitHub"];
+    if (!ssid) outcomes.push("No saved Wi-Fi", "No Wi-Fi set up");
+    if (!key) outcomes.push("No setup key");
+    const result = await waitFor(new RegExp(`sync: (${outcomes.join("|")})`), 60000);
+    const msg = result ? result.replace(/^.*sync: /, "") : null;
+    if (!msg) status(st, "Saved. The display will finish connecting on its own; check its screen.", "ok");
+    else if (/^(Loaded|Up to date)/.test(msg)) status(st, `All set: ${msg}. You can unplug the display.`, "ok");
+    else if (/GitHub 40[13]/.test(msg)) status(st, "Saved, but GitHub refused the setup key. Check the key and send it again.", "err");
+    else status(st, `Saved, but: ${msg}. Check the Wi-Fi name and password and send again.`, "warn");
+  } catch (e) {
+    log(String(e?.stack || e));
+    status(st, e?.name === "NotFoundError" ? "No port chosen." : (e.message || String(e)), "err");
+  } finally {
+    done = true;
+    try { await reader?.cancel(); reader?.releaseLock(); } catch {}
+    try { writer?.releaseLock(); } catch {}
+    try { await port?.close(); } catch {}
+  }
+});
+</script>
+</body>
+</html>
