@@ -10,3 +10,11 @@ Edge on a computer: https://ognightrider555-cell.github.io/job-display-installer
 
 The firmware here contains no keys or job data. The setup key is typed into
 the page and goes straight to the display over the USB cable.
+
+## DSSI Field Tools (PocketTerm)
+
+https://ognightrider555-cell.github.io/job-display-installer/fieldtools/ gives a
+one-line command to run in the PocketTerm's terminal. `fieldtools/install.sh`
+asks for a setup key (a read-only GitHub token for the private onvif-camtool
+repo), downloads the app into `~/dssi-field-tools` and adds its icons. Run it
+again to update. No app code is stored here.

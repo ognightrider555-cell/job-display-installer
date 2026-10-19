@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Field Tools Installer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tilt+Neon&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #05070a;
+    --panel: #0d1117;
+    --edge: #1f2933;
+    --text: #e8edf2;
+    --muted: #8a96a3;
+    --red: #ff2830;
+    --blue: #2878ff;
+    --green: #28ff6e;
+    --amber: #f5a524;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 500 17px/1.45 Rajdhani, system-ui, sans-serif;
+  }
+  main { max-width: 640px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 {
+    font: 400 clamp(34px, 9vw, 52px)/1 "Tilt Neon", sans-serif;
+    text-align: center;
+    margin: 8px 0 4px;
+    letter-spacing: 1px;
+  }
+  .dssi { color: #ffd6d8; text-shadow: 0 0 4px var(--red), 0 0 12px var(--red), 0 0 28px var(--red); }
+  .safety { color: #d6e4ff; text-shadow: 0 0 4px var(--blue), 0 0 12px var(--blue), 0 0 28px var(--blue); }
+  .tube { height: 3px; margin: 10px auto 6px; width: min(360px, 80%); border-radius: 2px;
+          background: #c8ffd9; box-shadow: 0 0 6px var(--green), 0 0 16px var(--green); }
+  .sub { text-align: center; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 28px; }
+  section {
+    background: var(--panel);
+    border: 1px solid var(--edge);
+    border-radius: 12px;
+    padding: 18px 18px 20px;
+    margin-bottom: 16px;
+  }
+  h2 { margin: 0 0 10px; font-size: 19px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+  h2 .n { display: inline-block; width: 26px; height: 26px; line-height: 26px; text-align: center;
+          border-radius: 50%; border: 2px solid var(--blue); color: var(--text); margin-right: 8px;
+          box-shadow: 0 0 8px var(--blue); font-size: 15px; }
+  p { margin: 6px 0; }
+  .muted { color: var(--muted); }
+  kbd { font: 600 15px Rajdhani, sans-serif; border: 1px solid #2a3440; border-bottom-width: 2px;
+        border-radius: 4px; padding: 0 5px; background: #05070a; }
+  code.cmd { display: block; background: #05070a; border: 1px solid #2a3440; border-radius: 6px; padding: 10px;
+             font: 13px/1.4 ui-monospace, monospace; color: #c8ffd9; word-break: break-all; user-select: all; }
+  button {
+    font: 700 17px Rajdhani, sans-serif; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--text); background: transparent; border: 2px solid var(--green); border-radius: 8px;
+    padding: 10px 18px; cursor: pointer; box-shadow: 0 0 10px rgba(40, 255, 110, .35);
+  }
+  button:hover { background: rgba(40, 255, 110, .12); }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 12px; }
+  .ok { color: var(--green); font-weight: 600; }
+  ul { margin: 6px 0; padding-left: 22px; }
+  details { margin-top: 12px; }
+  summary { cursor: pointer; color: var(--muted); }
+  .note { border-left: 3px solid var(--amber); padding-left: 10px; color: var(--muted); }
+  a { color: var(--blue); }
+</style>
+</head>
+<body>
+<main>
+  <h1><span class="dssi">DSSI</span> <span class="safety">SAFETY</span></h1>
+  <div class="tube"></div>
+  <div class="sub">Field Tools Installer</div>
+
+  <section>
+    <h2><span class="n">1</span>Get ready</h2>
+    <p>Do this on the PocketTerm itself, connected to Wi-Fi or Ethernet with internet.</p>
+    <p class="note">You'll need the setup key from the person who sent you this link.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span>Copy the command</h2>
+    <code class="cmd" id="cmd"></code>
+    <div class="row">
+      <button id="copy">Copy</button>
+      <span class="ok" id="copied"></span>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span>Run it</h2>
+    <p>Open <b>Terminal</b> from the taskbar or the app menu. Paste with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd>
+      and press <kbd>Enter</kbd>.</p>
+    <p>When it asks, paste the setup key and press <kbd>Enter</kbd>. The key stays hidden while you paste it.</p>
+    <p>It takes under a minute. When it says <b>Done</b>, tap the <b>DSSI Field Tools</b> button on the taskbar.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">4</span>Updates</h2>
+    <p>Run the same command again to get the newest version. Your camera settings (cameras.toml) are kept.</p>
+  </section>
+
+  <details>
+    <summary>If something goes wrong</summary>
+    <ul>
+      <li><b>GitHub refused the setup key:</b> paste the key again exactly, with no extra spaces.</li>
+      <li><b>GTK for Python is missing:</b> run the <code>sudo apt install</code> line it shows, then the command again.</li>
+      <li><b>Could not resolve host / download failed:</b> the PocketTerm has no internet. Check Wi-Fi.</li>
+      <li><b>Remove it:</b> delete the <code>dssi-field-tools</code> folder in your home folder and the DSSI Field Tools desktop icon.</li>
+    </ul>
+  </details>
+
+  <p class="muted" style="margin-top:24px">Looking for the job display? <a href="../">Job Display Installer</a></p>
+</main>
+
+<script>
+const url = new URL("install.sh", location.href).href;
+const cmd = `curl -fsSL ${url} | bash`;
+const box = document.getElementById("cmd");
+box.textContent = cmd;
+document.getElementById("copy").addEventListener("click", async () => {
+  const done = document.getElementById("copied");
+  try {
+    await navigator.clipboard.writeText(cmd);
+  } catch {
+    const r = document.createRange();
+    r.selectNodeContents(box);
+    getSelection().removeAllRanges();
+    getSelection().addRange(r);
+    document.execCommand("copy");
+  }
+  done.textContent = "Copied";
+  setTimeout(() => { done.textContent = ""; }, 2500);
+});
+</script>
+</body>
+</html>
